@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz di Lingua Italiana</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <style>
+        /* CSS styles go here */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            margin-bottom: 24px;
+            color: #00bfa5;
+            font-size: 32px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .question {
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .emoji {
+            font-size: 48px;
+            margin-top: 8px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 32px;
+        }
+
+        .options button {
+            margin-bottom: 16px;
+            padding: 12px 32px;
+            background-color: #00bfa5;
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .options button:hover {
+            background-color: #027c6b;
+        }
+
+        .score {
+            font-weight: bold;
+            margin-top: 32px;
+            text-align: center;
+            animation: slideIn 0.5s ease;
+        }
+
+        .character {
+            width: 200px;
+            height: 200px;
+            background-image: url('character.png'); /* Replace with your character image */
+            background-size: cover;
+            margin-left: 24px;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .intro-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #00bfa5, rgb(0, 175, 152));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .logo {
+            max-width: 200px;
+            max-height: 200px;
+        }
+
+        .intro-section.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .teaching-container {
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .teaching-text {
+            font-weight: bold;
+            margin-bottom: 16px;
+        }
+
+        .teaching-content-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .next-button {
+            margin-top: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="intro-section">
+        <img src="your-logo.png" alt="Logo" class="logo">
+    </div>
+
+    <div class="container">
+        <h1>Quiz di Lingua Italiana</h1>
+        <div class="question">
+            <p id="questionText"></p>
+            <p class="emoji"></p>
+        </div>
+        <div class="options">
+            <button onclick="checkAnswer('a')"></button>
+            <button onclick="checkAnswer('b')"></button>
+            <button onclick="checkAnswer('c')"></button>
+            <button onclick="checkAnswer('d')"></button>
+        </div>
+        <p id="scoreText" class="score"></p>
+        <button id="nextButton" class="next-button" onclick="nextQuestion()" style="display: none;">Avanti</button>
+    </div>
+
+    <script>
+        const levels = [
+            {
+                level: 1,
+                questions: [
+                    {
+                        question: "Qual è l'equivalente italiano della parola 'hello'?",
+                        emoji: "&#x1F44B;",
+                        options: {
+                            a: "Ciao",
+                            b: "Grazie",
+                            c: "Arrivederci",
+                            d: "Mi scusi"
+                        },
+                        answer: "a"
+                    },
+                    {
+                        teaching: true,
+                        lesson: "Ottimo! Continuiamo ad imparare l'italiano. Ripeti dopo di me:",
+                        teachingContent: [
+                            "Casa - House",
+                            "Cane - Dog",
+                            "Gatto - Cat",
+                            "Libro - Book",
+                            "Amico/Amica - Friend",
+                            "Cibo - Food",
+                            "Acqua - Water",
+                            "Scuola - School",
+                            "Canzone - Song",
+                            "Famiglia - Family"
+                        ]
+                    },
+                    {
+                        question: "Il colore 'verde' si traduce in inglese come:",
+                        emoji: "&#x1F49A;",
+                        options: {
+                            a: "Red",
+                            b: "Blue",
+                            c: "Green",
+                            d: "Yellow"
+                        },
+                        answer: "c"
+                    },
+                    {
+                        teaching: true,
+                        lesson: "Stai progredendo molto bene! Continuiamo ad imparare l'italiano. Ripeti dopo di me:",
+                        teachingContent: [
+                            "Buongiorno, come stai? - Good morning, how are you?",
+                            "Mi chiamo [nome] - My name is [name]",
+                            "Che ora è? - What time is it?",
+                            "Mi piace - I like",
+                            "Non mi piace - I don't like",
+                            "Dov'è? - Where is it?",
+                            "Per favore, parla lentamente - Please speak slowly",
+                            "Puoi aiutarmi? - Can you help me?",
+                            "Mi dispiace - I'm sorry",
+                            "Grazie per l'aiuto! - Thank you for your help!"
+                        ]
+                    },
+                    {
+                        question: "Qual è la capitale dell'Italia?",
+                        emoji: "&#x1F30E;",
+                        options: {
+                            a: "Roma",
+                            b: "Milano",
+                            c: "Venezia",
+                            d: "Firenze"
+                        },
+                        answer: "a"
+                    },
+                    {
+                        teaching: true,
+                        lesson: "Bravo! Continuiamo ad ampliare il nostro vocabolario italiano. Ripeti dopo di me:",
+                        teachingContent: [
+                            "Festa - Party",
+                            "Spiaggia - Beach",
+                            "Montagna - Mountain",
+                            "Ristorante - Restaurant",
+                            "Hotel - Hotel",
+                            "Negozio - Store",
+                            "Cinema - Cinema",
+                            "Museo - Museum",
+                            "Parco - Park",
+                            "Stadio - Stadium"
+                        ]
+                    },
+                    {
+                        question: "Qual è il numero che segue 5?",
+                        emoji: "&#x1F522;",
+                        options: {
+                            a: "6",
+                            b: "4",
+                            c: "7",
+                            d: "3"
+                        },
+                        answer: "a"
+                    }
+                ]
+            },
+            {
+                level: 2,
+                questions: [
+                    {
+                        question: "Qual è l'equivalente italiano della parola 'goodbye'?",
+                        emoji: "&#x1F44B;",
+                        options: {
+                            a: "Ciao",
+                            b: "Grazie",
+                            c: "Arrivederci",
+                            d: "Mi scusi"
+                        },
+                        answer: "c"
+                    },
+                    {
+                        teaching: true,
+                        lesson: "Ottimo! Continuiamo a imparare l'italiano. Ripeti dopo di me:",
+                        teachingContent: [
+                            "Fiore - Flower",
+                            "Albero - Tree",
+                            "Strada - Street",
+                            "Città - City",
+                            "Musica - Music",
+                            "Foto - Photo",
+                            "Bicicletta - Bicycle",
+                            "Treno - Train",
+                            "Autobus - Bus",
+                            "Aereo - Airplane"
+                        ]
+                    },
+                    {
+                        question: "Il colore 'blu' si traduce in inglese come:",
+                        emoji: "&#x1F499;",
+                        options: {
+                            a: "Red",
+                            b: "Blue",
+                            c: "Green",
+                            d: "Yellow"
+                        },
+                        answer: "b"
+                    },
+                    {
+                        teaching: true,
+                        lesson: "Molto bene! Continuiamo a imparare frasi utili in italiano. Ripeti dopo di me:",
+                        teachingContent: [
+                            "Dov'è il bagno? - Where is the bathroom?",
+                            "Quanto costa? - How much does it cost?",
+                            "Vorrei un caffè, per favore - I would like a coffee, please",
+                            "Posso pagare con la carta? - Can I pay with a card?",
+                            "Non capisco - I don't understand",
+                            "Puoi ripetere, per favore? - Can you repeat, please?",
+                            "Cosa consigli? - What do you recommend?",
+                            "Dove posso mangiare cibo tipico? - Where can I eat typical food?",
+                            "A che ora parte il volo? - What time does the flight depart?",
+                            "Arrivederci! - Goodbye!"
+                        ]
+                    },
+                    {
+                        question: "Qual è la capitale della Spagna?",
+                        emoji: "&#x1F30F;",
+                        options: {
+                            a: "Madrid",
+                            b: "Barcellona",
+                            c: "Valencia",
+                            d: "Siviglia"
+                        },
+                        answer: "a"
+                    },
+                    {
+                        teaching: true,
+                        lesson: "Super! Continuiamo ad ampliare il nostro vocabolario italiano. Ripeti dopo di me:",
+                        teachingContent: [
+                            "Auto - Car",
+                            "Bicicletta - Bicycle",
+                            "Aereo - Airplane",
+                            "Treno - Train",
+                            "Barca - Boat",
+                            "Taxi - Taxi",
+                            "Metropolitana - Subway",
+                            "Autobus - Bus",
+                            "Camminata - Walking",
+                            "Corsa - Running"
+                        ]
+                    },
+                    {
+                        question: "Qual è il numero che precede 9?",
+                        emoji: "&#x1F522;",
+                        options: {
+                            a: "8",
+                            b: "10",
+                            c: "7",
+                            d: "6"
+                        },
+                        answer: "a"
+                    }
+                ]
+            },
+            {
+                level: 3,
+                questions: [
+                    {
+                        question: "Qual è l'equivalente italiano della parola 'thank you'?",
+                        emoji: "&#x1F44B;",
+                        options: {
+                            a: "Ciao",
+                            b: "Grazie",
+                            c: "Arrivederci",
+                            d: "Mi scusi"
+                        },
+                        answer: "b"
+                    },
+                    {
+                        teaching: true,
+                        lesson: "Ottimo! Continuiamo ad imparare l'italiano. Ripeti dopo di me:",
+                        teachingContent: [
+                            "Tempo - Time",
+                            "Lavoro - Work",
+                            "Viaggio - Trip",
+                            "Vacanza - Vacation",
+                            "Lettura - Reading",
+                            "Scrittura - Writing",
+                            "Canzone - Song",
+                            "Film - Movie",
+                            "Danza - Dance",
+                            "Sport - Sport"
+                        ]
+                    },
+                    {
+                        question: "Il colore 'giallo' si traduce in inglese come:",
+                        emoji: "&#x1F49A;",
+                        options: {
+                            a: "Red",
+                            b: "Blue",
+                            c: "Green",
+                            d: "Yellow"
+                        },
+                        answer: "d"
+                    },
+                    {
+                        teaching: true,
+                        lesson: "Fantastico! Continuiamo ad imparare l'italiano. Ripeti dopo di me:",
+                        teachingContent: [
+                            "Mi dispiace - I'm sorry",
+                            "Ho bisogno di aiuto - I need help",
+                            "Mi sono perso/a - I am lost",
+                            "Sono stanco/a - I am tired",
+                            "Sono felice - I am happy",
+                            "Sono triste - I am sad",
+                            "Sono arrabbiato/a - I am angry",
+                            "Sono confuso/a - I am confused",
+                            "Sono occupato/a - I am busy",
+                            "Sono pronto/a - I am ready"
+                        ]
+                    },
+                    {
+                        question: "Qual è la capitale della Francia?",
+                        emoji: "&#x1F30F;",
+                        options: {
+                            a: "Parigi",
+                            b: "Lione",
+                            c: "Marsiglia",
+                            d: "Nizza"
+                        },
+                        answer: "a"
+                    },
+                    {
+                        teaching: true,
+                        lesson: "Bravissimo! Continuiamo ad ampliare il nostro vocabolario italiano. Ripeti dopo di me:",
+                        teachingContent: [
+                            "Festa - Party",
+                            "Spiaggia - Beach",
+                            "Montagna - Mountain",
+                            "Ristorante - Restaurant",
+                            "Hotel - Hotel",
+                            "Negozio - Store",
+                            "Cinema - Cinema",
+                            "Museo - Museum",
+                            "Parco - Park",
+                            "Stadio - Stadium"
+                        ]
+                    },
+                    {
+                        question: "Qual è il numero che segue 15?",
+                        emoji: "&#x1F522;",
+                        options: {
+                            a: "16",
+                            b: "14",
+                            c: "17",
+                            d: "13"
+                        },
+                        answer: "a"
+                    }
+                ]
+            }
+        ];
+
+        let currentLevelIndex = 0;
+        let currentQuestionIndex = 0;
+        let score = 0;
+
+        function displayQuestion() {
+            const currentLevel = levels[currentLevelIndex];
+            const currentQuestion = currentLevel.questions[currentQuestionIndex];
+
+            const questionText = document.getElementById("questionText");
+            questionText.innerHTML = currentQuestion.question;
+
+            const emoji = document.querySelector(".emoji");
+            emoji.innerHTML = currentQuestion.emoji;
+
+            const optionsContainer = document.querySelector(".options");
+            optionsContainer.innerHTML = "";
+
+            for (const option in currentQuestion.options) {
+                const button = document.createElement("button");
+                button.textContent = currentQuestion.options[option];
+                button.setAttribute("onclick", `checkAnswer('${option}')`);
+                optionsContainer.appendChild(button);
+            }
+
+            if (currentQuestion.teaching) {
+                const teachingContainer = document.createElement("div");
+                teachingContainer.classList.add("teaching-container");
+
+                const teachingText = document.createElement("p");
+                teachingText.classList.add("teaching-text");
+                teachingText.textContent = currentQuestion.lesson;
+                teachingContainer.appendChild(teachingText);
+
+                if (currentQuestion.teachingContent && currentQuestion.teachingContent.length > 0) {
+                    const teachingContentList = document.createElement("ul");
+                    teachingContentList.classList.add("teaching-content-list");
+
+                    for (const content of currentQuestion.teachingContent) {
+                        const contentItem = document.createElement("li");
+                        contentItem.textContent = content;
+                        teachingContentList.appendChild(contentItem);
+                    }
+
+                    teachingContainer.appendChild(teachingContentList);
+                }
+
+                optionsContainer.appendChild(teachingContainer);
+
+                const nextButton = document.getElementById("nextButton");
+                nextButton.style.display = "block";
+            } else {
+                const nextButton = document.getElementById("nextButton");
+                nextButton.style.display = "none";
+            }
+        }
+
+        function checkAnswer(selectedOption) {
+            const currentLevel = levels[currentLevelIndex];
+            const currentQuestion = currentLevel.questions[currentQuestionIndex];
+
+            if (!currentQuestion.teaching) {
+                if (selectedOption === currentQuestion.answer) {
+                    score++;
+                }
+            }
+
+            if (currentQuestionIndex < currentLevel.questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                if (currentLevelIndex < levels.length - 1) {
+                    const continueLearning = confirm("Congratulazioni! Hai completato il livello " + currentLevel.level + ". Vuoi continuare ad imparare l'italiano?");
+                    if (continueLearning) {
+                        currentQuestionIndex = 0;
+                        currentLevelIndex++;
+                        displayQuestion();
+                    } else {
+                        showScore();
+                    }
+                } else {
+                    showScore();
+                }
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        function showScore() {
+            const container = document.querySelector(".container");
+            const scoreText = document.getElementById("scoreText");
+            scoreText.textContent = "Quiz completato! Punteggio: " + score + " su " + getTotalQuestionsCount();
+            scoreText.style.display = "block";
+        }
+
+        function getTotalQuestionsCount() {
+            let totalQuestionsCount = 0;
+            for (const level of levels) {
+                totalQuestionsCount += level.questions.length;
+            }
+            return totalQuestionsCount;
+        }
+
+        // Function to hide the intro section after a certain duration
+        function hideIntroSection() {
+            const introSection = document.querySelector('.intro-section');
+            introSection.classList.add('hide');
+        }
+
+        // Hide the intro section after 5 seconds (5000 milliseconds)
+        setTimeout(hideIntroSection, 5000);
+
+        displayQuestion();
+    </script>
+</body>
+
+</html>
